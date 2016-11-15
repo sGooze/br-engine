@@ -1,0 +1,60 @@
+// TODO:
+// 1. $reflection parameter for custom reflection map
+// 2. $basemat for specifying base material 
+// 3. Separate #lights category?
+// 4. 
+
+#shaders
+	"DefaultShader"
+	{
+		//$vertex "shaders/default.vert"
+		//$fragment "shaders/default.frag"
+		$vertex "shaders/light.vert"
+		$fragment "shaders/light_mdl.frag"
+	}
+
+
+#materials
+// "ShaderName" : "shader_name"
+// 
+	"ErrorMat" : "DefaultShader" // TODO: Move error objects defenitons into separate .scene file (preferably, defined inside the code) 
+	{
+		$diffuse "textures/error.png"
+		$specular "textures/blank.png"
+		$emissive "textures/blank.png"
+		$shininess 1
+	}
+
+	"floormat" : "DefaultShader"
+	{
+		$diffuse "textures/woodfloor004a.png"
+		$specular "textures/woodfloor004a_spec.png"
+		//$emissive "IF ABSENT THEN BLANK"
+		$shininess 64
+	}
+	
+	"head_mat" : "DefaultShader"
+	{
+		$diffuse "textures/test.png"
+		$specular "textures/test_spec.png"
+		//$emissive "textures/test_ems.png"
+		$shininess 28
+	}
+
+#entities
+	"floormdl" : "mdl_static"
+	{
+		//$class "mdl_static"
+		//$name "floor model"
+		$mesh "mesh_path"
+		$material "floormat"
+		//$shader // Replace with holding shader in the server/scene class?
+		$start_pos "0.0 -1.0 0.0"
+		$rotation "35.0 92.0 14.0" // In angles, (0.0) if absent
+	}
+	
+	"test lamp" : "light_static"
+	{
+		$diffuse "1.0 0.8 0.7"
+		$specular "1.0 1.0 1.0"
+	}

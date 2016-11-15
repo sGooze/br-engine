@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="bng-gl" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bng-gl-dbg" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option use_console_runner="0" />
+				<Compiler>
+					<Add option="-std=c++11" />
+					<Add option="-g" />
+					<Add option="-Wno-switch" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bng-gl" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+			<Add directory="lib/sdl2/include/SDL2" />
+			<Add directory="lib/glew/include" />
+			<Add directory="lib/soil/src" />
+			<Add directory="lib/glm" />
+		</Compiler>
+		<Linker>
+			<Add library="mingw32" />
+			<Add library="SDL2main" />
+			<Add library="SDL2" />
+			<Add library="soil" />
+			<Add library="imm32" />
+			<Add library="glew32s" />
+			<Add library="glu32" />
+			<Add library="opengl32" />
+			<Add directory="lib/sdl2/lib" />
+			<Add directory="lib/glew/lib/Release/Win32" />
+			<Add directory="lib/soil/lib" />
+		</Linker>
+		<Unit filename="src/brd_camera.cpp" />
+		<Unit filename="src/brd_console.cpp" />
+		<Unit filename="src/brd_entity_common.cpp" />
+		<Unit filename="src/brd_lights.cpp" />
+		<Unit filename="src/brd_menu.cpp" />
+		<Unit filename="src/brd_object_model.cpp" />
+		<Unit filename="src/brd_scene.cpp" />
+		<Unit filename="src/brd_texture.cpp" />
+		<Unit filename="src/imgui/imconfig.h" />
+		<Unit filename="src/imgui/imgui.cpp" />
+		<Unit filename="src/imgui/imgui.h" />
+		<Unit filename="src/imgui/imgui_demo.cpp" />
+		<Unit filename="src/imgui/imgui_draw.cpp" />
+		<Unit filename="src/imgui/imgui_internal.h" />
+		<Unit filename="src/imgui/stb_rect_pack.h" />
+		<Unit filename="src/imgui/stb_textedit.h" />
+		<Unit filename="src/imgui/stb_truetype.h" />
+		<Unit filename="src/imgui_impl_sdl_gl3.cpp" />
+		<Unit filename="src/inc/brd_camera.h" />
+		<Unit filename="src/inc/brd_console.h" />
+		<Unit filename="src/inc/brd_input.h" />
+		<Unit filename="src/inc/brd_manager.h" />
+		<Unit filename="src/inc/brd_menu.h" />
+		<Unit filename="src/inc/brd_mesh.h" />
+		<Unit filename="src/inc/brd_object.h">
+			<Option weight="60" />
+		</Unit>
+		<Unit filename="src/inc/brd_scene.h" />
+		<Unit filename="src/inc/brd_shader.h" />
+		<Unit filename="src/inc/brd_shared.h" />
+		<Unit filename="src/inc/brd_texture.h" />
+		<Unit filename="src/inc/imgui_impl_sdl_gl3.h" />
+		<Unit filename="src/inc/main.h" />
+		<Unit filename="src/main.cpp" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+			<DoxyBlocks>
+				<comment_style block="0" line="0" />
+				<doxyfile_project />
+				<doxyfile_build />
+				<doxyfile_warnings />
+				<doxyfile_output />
+				<doxyfile_dot />
+				<general />
+			</DoxyBlocks>
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
