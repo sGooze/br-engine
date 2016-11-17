@@ -9,6 +9,7 @@
 #include "brd_mesh.h"
 #include "brd_object.h"
 #include "brd_shader.h"
+#include "brd_console.h"
 
 #define __BRD_SCENE
 
@@ -27,11 +28,12 @@ public:
     BRD_Material_Manager MatMan;
     BRD_Entity_Manager EntMan;
     BRD_Shader_Manager ShdMan;
+    //CON_Record_Manager ConLocal;  // Local variables
 
     Shader *shader_current = NULL;
 
     BRD_Scene(){init = false;}
-    BRD_Scene(const char* path);
+    BRD_Scene(const char* path, bool addin = false);
 };
 
 //----------------------------

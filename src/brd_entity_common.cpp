@@ -19,14 +19,14 @@ static BRD_Entity* ent_null(){
 }
 
 void RegisterClass_ClassRoot(){
-    std::cout << " class \"" << class_root << "\"\n";
+    DEBUG_COUT << " class \"" << class_root << "\"\n";
     BRD_EntityMaker *ent = ent_class_table.GetElementPtr(class_root, true);
     ent->func = ent_null;
-    std::cout << " /class \"" << class_root << "\"\n";
+    DEBUG_COUT << " /class \"" << class_root << "\"\n";
 }
 
 void RegisterClass_MdlStatic(){
-    std::cout << " class \"mdl_static\"\n";
+    DEBUG_COUT << " class \"mdl_static\"\n";
     //std::string tempname = std::string("mdl_static");
     BRD_EntityMaker *ent = ent_class_table.GetElementPtr("mdl_static", true);
     ent->func = mdl_static;
@@ -34,11 +34,11 @@ void RegisterClass_MdlStatic(){
     ent->params.add(TYPE_MTL, "material", offsetOfClassMember(&BRD_Model::material));
     ent->params.add(TYPE_VEC3, "start_pos", offsetOfClassMember(&BRD_Model::position));
     ent->params.add(TYPE_VEC3, "rotation", offsetOfClassMember(&BRD_Model::angles));
-    std::cout << " /class \"mdl_static\"\n";
+    DEBUG_COUT << " /class \"mdl_static\"\n";
 }
 
 void InitClassTable(){
     RegisterClass_ClassRoot();
     RegisterClass_MdlStatic();
-    std::cout << "Class table initialized\n";
+    DEBUG_COUT << "Class table initialized\n";
 }

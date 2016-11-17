@@ -10,7 +10,7 @@ static bool CheckForExistence(std::string& path){
         fclose(ifExists);
         return true;
     } else{
-        std::cout << "Unable to load file \"" << path << "\"\n";
+        DEBUG_COUT << "Unable to load file \"" << path << "\"\n";
         return false;
     }
 }
@@ -40,7 +40,7 @@ bool MeshLoaderFunc(std::string& path, BRD_Mesh& content){
 bool EntityLoaderFunction(std::string& classname, BRD_Entity*& content){
     BRD_EntityMaker* em = ent_class_table.GetElementPtr(classname);
     if (classname != em->classname){
-        std::cout << "ERROR: " << classname << " - unknown classname\n";
+        DEBUG_COUT << "ERROR: " << classname << " - unknown classname\n";
         return false;
     }
     content = em->func();
@@ -104,10 +104,10 @@ tokenVec StrToTokenVec(std::string str){
 /* * * * * * * * *       Scene parsing functions       * * * * * * * * */
 
 static void TokenContents(tokenVec& tkens){
-    std::cout << "  broken into " << tkens.size() << " tokens!\n{\n";
+    DEBUG_COUT << "  broken into " << tkens.size() << " tokens!\n{\n";
     for (int i = 0; i < tkens.size(); i++)
-        std::cout << "\t" << tkens[i] << std::endl;
-    std::cout << "}\n\n";
+        DEBUG_COUT << "\t" << tkens[i] << std::endl;
+    DEBUG_COUT << "}\n\n";
 }
 
 class ParserInfo{
@@ -149,7 +149,7 @@ typedef bool (*ParseFunc) (BRD_Scene*, std::string&);
 /* * * * * * * * *       Parse shader       * * * * * * * * */
 
 static bool ParseShader(BRD_Scene* scene, std::string& str){
-    std::cout << "SHADER: " << str << std::endl;
+    DEBUG_COUT << "SHADER: " << str << std::endl;
     tokenVec tkens = StrToTokenVec(str);
     if (tkens.size() <= 0)
         return true;
@@ -166,7 +166,7 @@ static bool ParseShader(BRD_Scene* scene, std::string& str){
     Shader *shd = (Shader*)info->object;
     try{
         for (int i = 0; i < tkens.size(); i++){
-            std::cout << " DEBUG: token " << i << " = '" << tkens[0] << "'\n";
+            DEBUG_COUT << " DEBUG: token " << i << " = '" << tkens[0] << "'\n";
             if (tkens[i].length() == 0)
                 continue;
             if (tkens[i].find("//") != std::string::npos)
@@ -174,11 +174,11 @@ static bool ParseShader(BRD_Scene* scene, std::string& str){
             // Parse braces
             if (tkens[i][0] == '{'){
                 if (info->inDesc == true){
-                    std::cout << " ERROR [token " << i+1 << "]: nested braces in the description!\n";
+                    DEBUG_COUT << " ERROR [token " << i+1 << "]: nested braces in the description!\n";
                     throw i;
                 }
                 if (info->HasName() == false){
-                    std::cout << " ERROR [token " << i+1 << "]: trying to register a material without a name!\n";
+                    DEBUG_COUT << " ERROR [token " << i+1 << "]: trying to register a material without a name!\n";
                     throw i;
                 }
                 info->inDesc = true;
@@ -186,7 +186,7 @@ static bool ParseShader(BRD_Scene* scene, std::string& str){
             }
             if (tkens[i][0] == '}'){
                 if (info->inDesc == false){
-                    std::cout << " ERROR [token " << i+1 << "]: invalid placement of the closing brace!\n";
+                    DEBUG_COUT << " ERROR [token " << i+1 << "]: invalid placement of the closing brace!\n";
                     throw i;
                 }
                 info->inDesc = false;
@@ -198,13 +198,13 @@ static bool ParseShader(BRD_Scene* scene, std::string& str){
                 info->AddObject(tkens[i], (void*)shd);
             } else{
                 if (info->inDesc == false){
-                    std::cout << " ERROR [token " << i+1 << "]: token outside of a description!\n";
+                    DEBUG_COUT << " ERROR [token " << i+1 << "]: token outside of a description!\n";
                     throw i;
                 }
                 if ((i == 0)&&(tkens[i][0] == '$')){
                     // Got a shader type: use the next token as a shader path
                     if (tkens.size() < 2){
-                        std::cout << " ERROR [token " << i+1 << "]: token without attached value: \"" << tkens[1] << "\"!\n";
+                        DEBUG_COUT << " ERROR [token " << i+1 << "]: token without attached value: \"" << tkens[1] << "\"!\n";
                         break;
                     }
                     GLint tmp;
@@ -213,28 +213,28 @@ static bool ParseShader(BRD_Scene* scene, std::string& str){
                     else if (tkens[0] == "$fragment")
                         tmp = shd->CompileShaderCode(tkens[1].c_str(), GL_FRAGMENT_SHADER);
                     else{
-                        std::cout << " ERROR [token " << i+1 << "]: unrecognized token: \"" << tkens[0] << "\"!\n";
+                        DEBUG_COUT << " ERROR [token " << i+1 << "]: unrecognized token: \"" << tkens[0] << "\"!\n";
                         break;
                     }
                     if (tmp == -1)
-                        std::cout << " ERROR [token " << i+1 << "]: unable to compile shader: \"" << tkens[1] << "\"!\n";
+                        DEBUG_COUT << " ERROR [token " << i+1 << "]: unable to compile shader: \"" << tkens[1] << "\"!\n";
                     break;
                 }
             }
         }
     } catch (int i){
-        std::cout << " Shader loading failed: description improperly formatted. (error on line " << i << ")\n";
+        DEBUG_COUT << " Shader loading failed: description improperly formatted. (error on line " << i << ")\n";
         info->closed = true;
         scene->ShdMan.DeleteLeaf(info->name);
         return false;
     }
     // After filling out parse info, finalize material by filling blank spaces
     if (info->closed == true){
-        std::cout << "Shader \"" << info->name << "\" ";
+        DEBUG_COUT << "Shader \"" << info->name << "\" ";
         if (shd->CompileProgram() == true)
-            std::cout << " was successfully loaded!\n";
+            DEBUG_COUT << " was successfully loaded!\n";
         else{
-            std::cout << " failed to load!\n";
+            DEBUG_COUT << " failed to load!\n";
             scene->ShdMan.DeleteLeaf(info->name);
         }
     }
@@ -250,7 +250,7 @@ static void ParseMaterial_LoadTex(BRD_Scene* scene, std::string& param, std::str
     // If texture loading fails, default texture (tex. manager root) is linked instead.
     BRD_Material *mat = (BRD_Material*)info->object;
     // TODO: Replace this monstrosity with something more comprehensive
-    std::cout << "  LoadTex pars: p = " << param << "\n              : n = " << next_param << std::endl;
+    DEBUG_COUT << "  LoadTex pars: p = " << param << "\n              : n = " << next_param << std::endl;
     switch (param[2]){
     case 'i': // $dIffuse
         if (info->params_set[0] != false) break;
@@ -262,12 +262,12 @@ static void ParseMaterial_LoadTex(BRD_Scene* scene, std::string& param, std::str
         if (info->params_set[2] != false) break;
         mat->emission = scene->TexMan.GetElementPtr(next_param, true); info->params_set[2] = true; return;
     case 'h': // $sHininess
-        if (info->params_set[3] != false) break; std::cout << " Adding SHININESS = " << atoi(next_param.c_str()) << std::endl;
+        if (info->params_set[3] != false) break; DEBUG_COUT << " Adding SHININESS = " << atoi(next_param.c_str()) << std::endl;
         mat->shininess = atoi(next_param.c_str()); info->params_set[3] = true; return;
     default:
-        std::cout << " Warning: unrecognized parameter \"" << param << "\"\n"; return;
+        DEBUG_COUT << " Warning: unrecognized parameter \"" << param << "\"\n"; return;
     }
-    std::cout << " Warning: skipped duplicate of parameter \"" << param << "\"\n"; return;
+    DEBUG_COUT << " Warning: skipped duplicate of parameter \"" << param << "\"\n"; return;
 }
 
 static void ParseMaterial_LoadDefault(BRD_Scene* scene, int param){
@@ -299,7 +299,7 @@ static bool ParseMaterial(BRD_Scene* scene, std::string& str){
        For each material parameter an appropriate token is found.
        If there is no such token, default value is passed.
     */
-    std::cout << "MAT: " << str << std::endl;
+    DEBUG_COUT << "MAT: " << str << std::endl;
     tokenVec tkens = StrToTokenVec(str);
     if (tkens.size() <= 0)
         return true;
@@ -316,7 +316,7 @@ static bool ParseMaterial(BRD_Scene* scene, std::string& str){
     BRD_Material *mat = (BRD_Material*)info->object;
     try{
         for (int i = 0; i < tkens.size(); i++){
-            std::cout << " DEBUG: token " << i << " = '" << tkens[i] << "'\n";
+            DEBUG_COUT << " DEBUG: token " << i << " = '" << tkens[i] << "'\n";
             if (tkens[i].length() == 0)
                 continue;
             if (tkens[i].find("//") != std::string::npos)
@@ -324,11 +324,11 @@ static bool ParseMaterial(BRD_Scene* scene, std::string& str){
             // Parse braces
             if (tkens[i][0] == '{'){
                 if (info->inDesc == true){
-                    std::cout << " ERROR [token " << i+1 << "]: nested braces in the description!\n";
+                    DEBUG_COUT << " ERROR [token " << i+1 << "]: nested braces in the description!\n";
                     throw i;
                 }
                 if (info->HasName() == false){
-                    std::cout << " ERROR [token " << i+1 << "]: trying to register a material without a name!\n";
+                    DEBUG_COUT << " ERROR [token " << i+1 << "]: trying to register a material without a name!\n";
                     throw i;
                 }
                 info->inDesc = true;
@@ -336,7 +336,7 @@ static bool ParseMaterial(BRD_Scene* scene, std::string& str){
             }
             if (tkens[i][0] == '}'){
                 if (info->inDesc == false){
-                    std::cout << " ERROR [token " << i+1 << "]: invalid placement of the closing brace!\n";
+                    DEBUG_COUT << " ERROR [token " << i+1 << "]: invalid placement of the closing brace!\n";
                     throw i;
                 }
                 info->inDesc = false;
@@ -351,23 +351,23 @@ static bool ParseMaterial(BRD_Scene* scene, std::string& str){
                     if (tkens[i][0] == ':'){
                         // We're still outside of the description, but the next token is valid and contains shader name
                         if (tkens.size() < i+1){
-                            std::cout << "  WARN [token " << i+1 << "]: no shader name specified for material \""
+                            DEBUG_COUT << "  WARN [token " << i+1 << "]: no shader name specified for material \""
                             << info->name << "\"; using default shader\n";
                             break;
                         }
-                        std::cout << "total: " << tkens.size();
-                        std::cout << " Got :, next token is " << tkens[i+1];
-                        std::cout << "\n";
+                        DEBUG_COUT << "total: " << tkens.size();
+                        DEBUG_COUT << " Got :, next token is " << tkens[i+1];
+                        DEBUG_COUT << "\n";
                         mat->shader = scene->ShdMan.GetElementPtr(tkens[i+1]);
                         if (mat->shader == NULL){
                             // Something horrible happened: shader manager is empty! This should never happen...
-                            std::cout << "  ERROR [token " << i+1 << "]: invalid shader name \"" << tkens[i+1]
+                            DEBUG_COUT << "  ERROR [token " << i+1 << "]: invalid shader name \"" << tkens[i+1]
                             << "\"specified for material \"" << info->name << "\"; shader manager is NULL\n";
                             throw i;
                         }
                         break;
                     } else{
-                        std::cout << " ERROR [token " << i+1 << "]: token outside of a description!\n";
+                        DEBUG_COUT << " ERROR [token " << i+1 << "]: token outside of a description!\n";
                         throw i;
                     }
                 }
@@ -380,7 +380,7 @@ static bool ParseMaterial(BRD_Scene* scene, std::string& str){
             }
         }
     } catch (int i){
-        std::cout << " Material loading failed: description improperly formatted. (error on line " << i << ")\n";
+        DEBUG_COUT << " Material loading failed: description improperly formatted. (error on line " << i << ")\n";
         info->closed = true;
         // Remove material
         // TODO: What kinda worries me is skipping remaining lines in a definition block that was
@@ -396,16 +396,16 @@ static bool ParseMaterial(BRD_Scene* scene, std::string& str){
                 ParseMaterial_LoadDefault(scene, i);
         if (mat->shader == NULL)
             mat->shader = scene->ShdMan.GetElementPtr(shader_root);
-        std::cout << "Material \"" << info->name << "\" ";
+        DEBUG_COUT << "Material \"" << info->name << "\" ";
         if (info->IsComplete(PARAMS_IN_MATERIAL) == true){
-            std::cout << " was successfully loaded!\n";
-            std::cout << "Diffuse = " << mat->diffuse->tpath << std::endl;
-            std::cout << "Specular = " << mat->specular->tpath << std::endl;
-            std::cout << "Emissive = " << mat->emission->tpath << std::endl;
-            std::cout << "Shininess = " << mat->shininess << std::endl;
+            DEBUG_COUT << " was successfully loaded!\n";
+            DEBUG_COUT << "Diffuse = " << mat->diffuse->tpath << std::endl;
+            DEBUG_COUT << "Specular = " << mat->specular->tpath << std::endl;
+            DEBUG_COUT << "Emissive = " << mat->emission->tpath << std::endl;
+            DEBUG_COUT << "Shininess = " << mat->shininess << std::endl;
         }
         else{
-            std::cout << " failed to load!\n";
+            DEBUG_COUT << " failed to load!\n";
             //delete mat;
             scene->MatMan.DeleteLeaf(info->name);
         }
@@ -422,33 +422,33 @@ static BRD_EntityMaker *mkr = NULL;
 static glm::vec3 TokenToVec3(std::string& token){
     // Vectors definitions should be formatted as following:
     // $vector_field "0.0 0.0 0.0"
-    std::cout << "|TokenToVec3 - got token \"" << token << "\"\n";
+    DEBUG_COUT << "|TokenToVec3 - got token \"" << token << "\"\n";
     tokenVec vec_fields = StrToTokenVec(token);
     TokenContents(vec_fields);
     if (vec_fields.size() != 3){
-        std::cout << "WARNING: Improperly formatted vec3 definition: \"" << token << "\"\n";
+        DEBUG_COUT << "WARNING: Improperly formatted vec3 definition: \"" << token << "\"\n";
         return glm::vec3(0.0, 0.0, 0.0);
     }
     //return glm::vec3((float)atof(vec_fields[0].c_str()), (float)atof(vec_fields[1].c_str()), (float)atof(vec_fields[2].c_str()));
     glm::vec3 fin = glm::vec3((float)atof(vec_fields[0].c_str()), (float)atof(vec_fields[1].c_str()), (float)atof(vec_fields[2].c_str()));
-    std::cout << "Vector: " << fin.x << " " << fin.y << " " << fin.z << std::endl;
+    DEBUG_COUT << "Vector: " << fin.x << " " << fin.y << " " << fin.z << std::endl;
     return fin;
 }
 
 static void ParseTokenToVec3(std::string& token, void *addr){
     // TokenToVec3 approach crashes and burns, so this will be used instead - at least, for now
-    std::cout << "|ParseTokenToVec3 - got token \"" << token << "\"\n";
+    DEBUG_COUT << "|ParseTokenToVec3 - got token \"" << token << "\"\n";
     tokenVec vec_fields = StrToTokenVec(token);
     TokenContents(vec_fields);
     glm::vec3 *fin = static_cast<glm::vec3*>(addr);
     if (vec_fields.size() != 3){
-        std::cout << "WARNING: Improperly formatted vec3 definition: \"" << token << "\"\n";
+        DEBUG_COUT << "WARNING: Improperly formatted vec3 definition: \"" << token << "\"\n";
         fin->x = fin->y = fin->z = 0;
     }
     fin->x = (float)atof(vec_fields[0].c_str());
     fin->y = (float)atof(vec_fields[1].c_str());
     fin->z = (float)atof(vec_fields[2].c_str());
-    std::cout << "Vector: " << fin->x << " " << fin->y << " " << fin->z << std::endl;
+    DEBUG_COUT << "Vector: " << fin->x << " " << fin->y << " " << fin->z << std::endl;
 }
 
 static bool ParseEntity_ParseTokens(tokenVec& tkens, BRD_Scene* scene){
@@ -458,38 +458,38 @@ static bool ParseEntity_ParseTokens(tokenVec& tkens, BRD_Scene* scene){
     // Use the data type of the appropriate field in the switch/case to correctly construct
     // the pointer to the data
     // Return false if key does not correspond to any fields in the table
-    std::cout << "ParseTokens: " << tkens[0];
+    DEBUG_COUT << "ParseTokens: " << tkens[0];
     BRD_Entity *ent = (BRD_Entity*)info->object;
     tkens[0].erase(0, 1);
     BRD_EntityParameter *par = ent->classmkr->params.find(tkens[0]);
     if (par == NULL){
-        std::cout << " - unknown token \n";
+        DEBUG_COUT << " - unknown token \n";
         return false;
     }
     void *ent_offset = ent + par->offset;
     switch (par->type){
     case TYPE_FILE:
         // TODO: File type detector function
-        std::cout << " - FILE field, offset = " << par->offset << std::endl;
+        DEBUG_COUT << " - FILE field, offset = " << par->offset << std::endl;
         return true;
     case TYPE_FLOAT:
-        std::cout << " - FLOAT field, offset = " << par->offset << std::endl;
+        DEBUG_COUT << " - FLOAT field, offset = " << par->offset << std::endl;
         *static_cast<float*>(ent_offset) = (float)atof(tkens[1].c_str());
         return true;
     case TYPE_INT:
-        std::cout << " - INT field, offset = " << par->offset << std::endl;
+        DEBUG_COUT << " - INT field, offset = " << par->offset << std::endl;
         *static_cast<int*>(ent_offset) = (int)atoi(tkens[1].c_str());
         return true;
     case TYPE_STRING:
-        std::cout << " - STRING field, offset = " << par->offset << std::endl;
+        DEBUG_COUT << " - STRING field, offset = " << par->offset << std::endl;
         *static_cast<std::string*>(ent_offset) = tkens[1];
     case TYPE_VEC3:
-        std::cout << " - VEC3 field, offset = " << par->offset << std::endl;
+        DEBUG_COUT << " - VEC3 field, offset = " << par->offset << std::endl;
         //*static_cast<glm::vec3*>(ent_offset) = TokenToVec3(tkens[1]);
         ParseTokenToVec3(tkens[1], ent_offset);
         return true;
     case TYPE_MTL:
-        std::cout << " - MATERIAL field, offset = " << par->offset << std::endl;
+        DEBUG_COUT << " - MATERIAL field, offset = " << par->offset << std::endl;
         *static_cast<BRD_Material**>(ent_offset) = scene->MatMan.GetElementPtr(tkens[1]);
         return true;
     }
@@ -516,7 +516,7 @@ static bool ParseEntity(BRD_Scene* scene, std::string& str){
     BRD_Entity *ent = (BRD_Entity*)info->object;
     try{
         for (int i = 0; i < tkens.size(); i++){
-            std::cout << " DEBUG: token " << i << " = '" << tkens[0] << "'\n";
+            DEBUG_COUT << " DEBUG: token " << i << " = '" << tkens[0] << "'\n";
             if (tkens[i].length() == 0)
                 continue;
             if (tkens[i].find("//") != std::string::npos)
@@ -524,11 +524,11 @@ static bool ParseEntity(BRD_Scene* scene, std::string& str){
             // Parse braces
             if (tkens[i][0] == '{'){
                 if (info->inDesc == true){
-                    std::cout << " ERROR [token " << i+1 << "]: nested braces in the description!\n";
+                    DEBUG_COUT << " ERROR [token " << i+1 << "]: nested braces in the description!\n";
                     throw i;
                 }
                 if (info->HasName() == false){
-                    std::cout << " ERROR [token " << i+1 << "]: trying to register an entity without a name!\n";
+                    DEBUG_COUT << " ERROR [token " << i+1 << "]: trying to register an entity without a name!\n";
                     throw i;
                 }
                 info->inDesc = true;
@@ -536,7 +536,7 @@ static bool ParseEntity(BRD_Scene* scene, std::string& str){
             }
             if (tkens[i][0] == '}'){
                 if (info->inDesc == false){
-                    std::cout << " ERROR [token " << i+1 << "]: invalid placement of the closing brace!\n";
+                    DEBUG_COUT << " ERROR [token " << i+1 << "]: invalid placement of the closing brace!\n";
                     throw i;
                 }
                 info->inDesc = false;
@@ -546,7 +546,7 @@ static bool ParseEntity(BRD_Scene* scene, std::string& str){
             // Parse classname
             if (tkens[i].find(":") != std::string::npos){
                 if (tkens.size() < i+1){
-                    std::cout << " ERROR [token " << i+1 << "]: classname isn't specified!\n";
+                    DEBUG_COUT << " ERROR [token " << i+1 << "]: classname isn't specified!\n";
                     throw i;
                 }
                 // If token[i] is the colon, then [i+1] is the classname, and [i-1] is the entity name
@@ -561,7 +561,7 @@ static bool ParseEntity(BRD_Scene* scene, std::string& str){
 
             if (info->HasName() == true){
                 if (info->inDesc == false){
-                    std::cout << " ERROR [token " << i+1 << "]: token outside of the description!\n";
+                    DEBUG_COUT << " ERROR [token " << i+1 << "]: token outside of the description!\n";
                     throw i;
                 }
                 if ((i == 0)&&(tkens[i][0] == '$')&&(tkens.size() >= 2)){
@@ -570,7 +570,7 @@ static bool ParseEntity(BRD_Scene* scene, std::string& str){
             }
         }
     } catch (int i){
-        std::cout << " Entity loading failed: (error on line " << i << ")\n";
+        DEBUG_COUT << " Entity loading failed: (error on line " << i << ")\n";
         info->closed = true;
         mkr = NULL;
         // Remove entity
@@ -582,7 +582,7 @@ static bool ParseEntity(BRD_Scene* scene, std::string& str){
     // After filling out parse info, finalize entity by naming it
     if (info->closed == true){
         scene->EntMan.ChangeName(ent->classmkr->classname, info->name);
-        std::cout << "New entity added: \"" << info->name << "\" ";
+        DEBUG_COUT << "New entity added: \"" << info->name << "\" ";
     }
     return true;
 }
@@ -593,20 +593,22 @@ typedef enum{PARSE_SKIP, PARSE_MATERIAL, PARSE_ENTITY, PARSE_SHADER} ParseMod;
 static std::string _ptkens[] = {"skip", "materials", "entities", "shaders"};
 static ParseFunc pfptrs[] = {NULL, ParseMaterial, ParseEntity, ParseShader};
 
-BRD_Scene::BRD_Scene(const char* path){
+BRD_Scene::BRD_Scene(const char* path, bool addin){
     // Reads the scene file, formats it into token array (or, at least, cuts off leading whitespace),
     // and transfers that array to the line parser function, specified by the current parse mode
     // TODO: scene should be loaded from scratch only when specified to do so! By default all data from the scene file
     //  should be loaded alongside previously loaded data to enable loading scenes divided into multiple files.
     //  This probably means that all this code should not be located in the constructor, but in the separate scene
     //  parser function instead.
+    // addin = false -> unload current scene before loading new data
+    // addin = true  -> load new data
     std::ifstream sceneFile;
     std::stringstream sceneStream;
     std::string sceneString;
     sceneFile.exceptions(std::ifstream::badbit);
     init = false;
     try{
-        std::cout << "Loading scene file \"" << path << "\"\n";
+        DEBUG_COUT << "Loading scene file \"" << path << "\"\n";
         sceneFile.open(path);
         sceneStream << sceneFile.rdbuf();
         sceneFile.close();
@@ -637,12 +639,12 @@ BRD_Scene::BRD_Scene(const char* path){
             if (((sceneString[0] == '/')&&(sceneString[1] == '/'))||(sceneString.empty())||(parseMod == PARSE_SKIP))
                 continue;
             if (pfptrs[(int)parseMod](this, sceneString) == false)
-                std::cout << "[" << line << "]: line parsed unsuccessfully\n";
+                DEBUG_COUT << "[" << line << "]: line parsed unsuccessfully\n";
         }
     } catch (std::ifstream::failure f){
-        std::cout << "BRD_Scene::BRD_Scene: An I/O error has occurred while trying to parse the file \"" << path << "\"\n";
+        DEBUG_COUT << "BRD_Scene::BRD_Scene: An I/O error has occurred while trying to parse the file \"" << path << "\"\n";
         // TODO: Scene loading halts the loading procedure and returns game into main menu/console
     }
-    std::cout << "\n\n\n";
+    DEBUG_COUT << "\n\n\n";
     init = true;
 }

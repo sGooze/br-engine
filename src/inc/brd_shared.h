@@ -44,4 +44,8 @@ extern BRD_Scene *cscene;
 // do determine data type of the variables.
 typedef enum{TYPE_NULL, TYPE_INT, TYPE_FLOAT, TYPE_STRING, TYPE_VEC3, TYPE_FILE, TYPE_MTL, TYPE_FUNC} paramType;
 
+// Debug data output and input operations. Most of them will be removed or replaced with something more convenient
+#define DEBUG_COUT std::cout
+#define DEBUG_CIN  std::cin
+
 #endif // __BRD_SHARED

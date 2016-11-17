@@ -31,3 +31,6 @@ obj/
 
 # Client-side note files
 *.note
+
+# Code::Blocks
+*.layout

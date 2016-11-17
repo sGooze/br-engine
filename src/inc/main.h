@@ -14,10 +14,7 @@
 #define __MAIN_H
 
 //Starts up SDL, creates window, and initializes OpenGL
-bool init();
-
-//Initializes rendering program and clear color
-bool initGL();
+bool BNG_Init();
 
 //Frees media and shuts down SDL
 void close();

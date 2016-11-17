@@ -28,14 +28,17 @@ public:
         data_type = TYPE_NULL;
         data_ptr = data;
     }
+    CON_Record(){data_ptr = NULL;}
 };
 
 // Add new record to the record manager (use instead of constructors)
-bool CON_Record_Register(void *var_ptr, paramType var_data_type, std::string cmd_help = "");
+bool CON_Record_Register(std::string& name, void *var_ptr, paramType var_data_type, std::string cmd_help = ""); //bool local = false
 
 bool ConRecordLoaderFunc(std::string& name, CON_Record&);
 extern std::string recordname_blank = "wait";
 typedef binTree_Manager<CON_Record, ConRecordLoaderFunc, &recordname_blank> CON_Record_Manager;
+
+extern CON_Record_Manager consoleGlobal;
 
 void ConsoleExampleWindow();
 

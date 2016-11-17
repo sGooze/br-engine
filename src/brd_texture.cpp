@@ -8,10 +8,10 @@ static BRD_Texture2D *BRD_Texture2D_Black, *BRD_Texture2D_White;
 
 BRD_Texture2D::BRD_Texture2D(const char* path){
     int w, h;
-    std::cout << "Loading from " << path << std::endl;
+    DEBUG_COUT << "Loading from " << path << std::endl;
     unsigned char* image = SOIL_load_image(path, &w, &h, 0, SOIL_LOAD_RGBA);
     if (image != '\0'){
-        std::cout << "Texture loaded! Size: " << w << "x" << h << std::endl;
+        DEBUG_COUT << "Texture loaded! Size: " << w << "x" << h << std::endl;
         width = w; height = h;
         tpath = path;
         // TODO: Flip y-axis for loaded images
@@ -34,7 +34,7 @@ BRD_Texture2D::BRD_Texture2D(const char* path){
             SOIL_free_image_data(image);
         glBindTexture(GL_TEXTURE_2D, 0);
     } else{
-        std::cout << "ERROR! Unable to load texture!" << std::endl;
+        DEBUG_COUT << "ERROR! Unable to load texture!" << std::endl;
         tex = 0;
     }
 }
@@ -103,7 +103,7 @@ static BRD_TextureCube *cubemap_std_data;
 
 BRD_TextureCube::BRD_TextureCube(const char* path_prefix, const char* path_postfix){
     int w, h;
-    std::cout << "Loading cubemap from " << path_prefix << "X" << path_postfix << std::endl;
+    DEBUG_COUT << "Loading cubemap from " << path_prefix << "X" << path_postfix << std::endl;
     // TODO: throw/catch for exceptions
     //const char* prefixes[6] = {"_right", "_left", "_top", "_bottom", "_back", "_front"};
     const char* prefixes[6] = {"rt", "lf", "up", "dn", "bk", "ft"};
@@ -116,9 +116,9 @@ BRD_TextureCube::BRD_TextureCube(const char* path_prefix, const char* path_postf
             std::string path;
             path_stream << path_prefix << prefixes[i] << path_postfix;
             //path = path_stream.str(); path.c_str()
-            std::cout << "  [" << i << "]: " << path << "(";
+            DEBUG_COUT << "  [" << i << "]: " << path << "(";
             unsigned char* image = SOIL_load_image(path_stream.str().c_str(), &w, &h, 0, SOIL_LOAD_RGB);
-            std::cout << w << "x" << h << ")\n";
+            DEBUG_COUT << w << "x" << h << ")\n";
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
             SOIL_free_image_data(image);
         }
@@ -130,7 +130,7 @@ BRD_TextureCube::BRD_TextureCube(const char* path_prefix, const char* path_postf
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-    std::cout << "Texture loaded! \n";
+    DEBUG_COUT << "Texture loaded! \n";
 }
 
 void BRD_TextureCube_InitStd(){

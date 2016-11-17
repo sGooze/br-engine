@@ -5,17 +5,21 @@ const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 600;
 BRD_Scene *cscene;
 
-        long sectors = 0;
 static  bool keys[1024]  = {false};
 static  bool render_gui = true;
 
-bool init(){
+static  const char* win_title = "bng-gl";
+
+bool BNG_Init(){
 	//Initialize SDL
 	if( SDL_Init( SDL_INIT_VIDEO ) < 0 ){
-		std::cout << "SDL could not initialize! SDL Error: " << SDL_GetError() << std::endl;
+		DEBUG_COUT << "SDL could not initialize! SDL Error: " << SDL_GetError() << std::endl;
 		return false;
 	}
 
+	// *** BNG_Init_Video()
+    {
+    // if flag("vid") = true
     //Use OpenGL 3.3 core
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
     SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 3 );
@@ -24,22 +28,22 @@ bool init(){
     SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
 
     //Create window
-    glWindow = SDL_CreateWindow("BEnGL", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN );
+    glWindow = SDL_CreateWindow(win_title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN );
     if( glWindow == NULL ){
-        std::cout << "Window could not be created! SDL Error: " << SDL_GetError() << std::endl;
+        DEBUG_COUT << "Window could not be created! SDL Error: " << SDL_GetError() << std::endl;
         return false;
     }
     //Create context
     glContext = SDL_GL_CreateContext( glWindow );
     if( glContext == NULL ){
-        std::cout << "OpenGL context could not be created! SDL Error: " << SDL_GetError() << std::endl;
+        DEBUG_COUT << "OpenGL context could not be created! SDL Error: " << SDL_GetError() << std::endl;
         return false;
     }
     //Initialize GLEW
     glewExperimental = GL_TRUE;
     GLenum glewError = glewInit();
     if( glewError != GLEW_OK ){
-        std::cout << "Error initializing GLEW! " << glewGetErrorString(glewError) << std::endl;
+        DEBUG_COUT << "Error initializing GLEW! " << glewGetErrorString(glewError) << std::endl;
         return false;
     }
 
@@ -47,6 +51,8 @@ bool init(){
     BRD_Texture2D_InitBW();
 
 	ImGui_ImplSdlGL3_Init(glWindow);
+    }
+    // *** BNG_Init_Video()
 	atexit(close);
 	return true;
 }
@@ -92,8 +98,8 @@ int main( int argc, char* args[] ){
     // INITIALIZATION STEP
     // Some of that code will go into the main engine initialization function, some - to the scene constructor
 	//Start up SDL and create a window
-	if(!init()){
-		std::cout <<  "Failed to initialize!" << std::endl;
+	if(!BNG_Init()){
+		DEBUG_COUT <<  "Failed to initialize!" << std::endl;
 		return -1;
 	}
 
@@ -101,15 +107,16 @@ int main( int argc, char* args[] ){
     cscene = new BRD_Scene("test.scene");
 
 	// Scene debug
-	std::cout << "Scene contents:\nTexture list:\n\n";
+	DEBUG_COUT << "Scene contents:\nTexture list:\n\n";
 	cscene->TexMan.PrintLeaves();
-	std::cout << "\nMaterial list:\n\n";
+	DEBUG_COUT << "\nMaterial list:\n\n";
 	cscene->MatMan.PrintLeaves();
-	std::cout << "\n";
-	std::cout << "Scene loading step: completed\n";
+	DEBUG_COUT << "\n";
+	DEBUG_COUT << "Scene loading step: completed\n";
     system("pause");
 
 	// OpenGL parameters
+	// if flag("vid") = true
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 	glEnable(GL_BLEND);
     glBlendEquation(GL_FUNC_ADD);
