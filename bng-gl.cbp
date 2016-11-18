@@ -12,6 +12,7 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Option use_console_runner="0" />
+				<Option parameters="--novid" />
 				<Compiler>
 					<Add option="-std=c++11" />
 					<Add option="-g" />
@@ -55,6 +56,7 @@
 		<Unit filename="src/brd_camera.cpp" />
 		<Unit filename="src/brd_console.cpp" />
 		<Unit filename="src/brd_entity_common.cpp" />
+		<Unit filename="src/brd_init.cpp" />
 		<Unit filename="src/brd_lights.cpp" />
 		<Unit filename="src/brd_menu.cpp" />
 		<Unit filename="src/brd_object_model.cpp" />
@@ -72,6 +74,7 @@
 		<Unit filename="src/imgui_impl_sdl_gl3.cpp" />
 		<Unit filename="src/inc/brd_camera.h" />
 		<Unit filename="src/inc/brd_console.h" />
+		<Unit filename="src/inc/brd_init.h" />
 		<Unit filename="src/inc/brd_input.h" />
 		<Unit filename="src/inc/brd_manager.h" />
 		<Unit filename="src/inc/brd_menu.h" />
@@ -83,6 +86,7 @@
 		<Unit filename="src/inc/brd_shader.h" />
 		<Unit filename="src/inc/brd_shared.h" />
 		<Unit filename="src/inc/brd_texture.h" />
+		<Unit filename="src/inc/brd_video.h" />
 		<Unit filename="src/inc/imgui_impl_sdl_gl3.h" />
 		<Unit filename="src/inc/main.h" />
 		<Unit filename="src/main.cpp" />

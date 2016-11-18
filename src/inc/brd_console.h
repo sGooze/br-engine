@@ -21,7 +21,7 @@ public:
         data_type = TYPE_FUNC;
     }*/
     CON_Record(void *var_ptr, paramType var_data_type, std::string cmd_help = "") : help_text(cmd_help){
-        data_ptr = CommandFuncPtr;
+        data_ptr = var_ptr;
         data_type = var_data_type;
     }
     CON_Record(void *data){
@@ -35,11 +35,18 @@ public:
 bool CON_Record_Register(std::string& name, void *var_ptr, paramType var_data_type, std::string cmd_help = ""); //bool local = false
 
 bool ConRecordLoaderFunc(std::string& name, CON_Record&);
-extern std::string recordname_blank = "wait";
+extern std::string recordname_blank;
 typedef binTree_Manager<CON_Record, ConRecordLoaderFunc, &recordname_blank> CON_Record_Manager;
 
 extern CON_Record_Manager consoleGlobal;
 
 void ConsoleExampleWindow();
+
+// Typedefs for variables registered as cvars
+typedef int cvar_int;
+typedef char cvar_char;
+typedef float cvar_float;
+typedef double cvar_double;
+typedef std::string cvar_string;
 
 #endif // __BRD_CONSOLE

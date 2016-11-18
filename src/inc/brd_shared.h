@@ -6,6 +6,7 @@
 // SDL, GL and GLEW includes
 #define GLEW_STATIC
 #include <SDL.h>
+// TODO: Move GL-Specific includes to brd_video.h ?
 #include <gl\glew.h>
 #include <SDL_opengl.h>
 #include <gl\glu.h>

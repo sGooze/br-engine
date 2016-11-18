@@ -1,12 +1,13 @@
 #include "inc/brd_console.h"
 
-extern CON_Record_Manager consoleGlobal;
+ std::string recordname_blank = "wait";
+ CON_Record_Manager consoleGlobal;
 
-bool CON_Record_Register(std::string& name, void *var_ptr, paramType var_data_type, std::string cmd_help = ""){
+bool CON_Record_Register(std::string& name, void *var_ptr, paramType var_data_type, std::string cmd_help){
     if ((name.length() == 0)||(var_ptr == NULL))
         return false;
-    CON_Record *rec;
-    if (consoleGlobal.GetElementPtr(name, true)->data_ptr != NULL){
+    CON_Record *rec = consoleGlobal.GetElementPtr(name, true);
+    if (rec->data_ptr != NULL){
         // Element already exists
         DEBUG_COUT << "Con_Record_Register: console record named \"" << name << "\" already exists!\n";
         return false;

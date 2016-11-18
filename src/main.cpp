@@ -8,70 +8,22 @@ BRD_Scene *cscene;
 static  bool keys[1024]  = {false};
 static  bool render_gui = true;
 
-static  const char* win_title = "bng-gl";
-
-bool BNG_Init(){
-	//Initialize SDL
-	if( SDL_Init( SDL_INIT_VIDEO ) < 0 ){
-		DEBUG_COUT << "SDL could not initialize! SDL Error: " << SDL_GetError() << std::endl;
-		return false;
-	}
-
-	// *** BNG_Init_Video()
-    {
-    // if flag("vid") = true
-    //Use OpenGL 3.3 core
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
-    SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 3 );
-    SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 3 );
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-    SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
-
-    //Create window
-    glWindow = SDL_CreateWindow(win_title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN );
-    if( glWindow == NULL ){
-        DEBUG_COUT << "Window could not be created! SDL Error: " << SDL_GetError() << std::endl;
-        return false;
-    }
-    //Create context
-    glContext = SDL_GL_CreateContext( glWindow );
-    if( glContext == NULL ){
-        DEBUG_COUT << "OpenGL context could not be created! SDL Error: " << SDL_GetError() << std::endl;
-        return false;
-    }
-    //Initialize GLEW
-    glewExperimental = GL_TRUE;
-    GLenum glewError = glewInit();
-    if( glewError != GLEW_OK ){
-        DEBUG_COUT << "Error initializing GLEW! " << glewGetErrorString(glewError) << std::endl;
-        return false;
-    }
-
-    glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    BRD_Texture2D_InitBW();
-
-	ImGui_ImplSdlGL3_Init(glWindow);
-    }
-    // *** BNG_Init_Video()
-	atexit(close);
-	return true;
-}
-
-void close(){
-	//Destroy window
-	SDL_GL_DeleteContext(glContext);
-	SDL_DestroyWindow( glWindow );
-	glWindow = NULL;
-	ImGui_ImplSdlGL3_Shutdown();
-
-	//Quit SDL subsystems
-	SDL_Quit();
-}
+extern  char* glWinTitle = "bng-gl";
+static bool isquit = false;
 
 bool BRD_IsKeyPressed(int scancode){
     bool res = keys[scancode];
     if (res == true) keys[scancode] = false;
     return res;
+}
+
+static void DEBUG_Console(){
+    std::string con_input;
+    DEBUG_CIN >> con_input;
+    if (con_input == "quit")
+        isquit = true;
+    else
+        DEBUG_COUT << " console: " << con_input << std::endl;
 }
 
 BRD_Mesh LoadTestObject(){
@@ -98,13 +50,11 @@ int main( int argc, char* args[] ){
     // INITIALIZATION STEP
     // Some of that code will go into the main engine initialization function, some - to the scene constructor
 	//Start up SDL and create a window
-	if(!BNG_Init()){
+	if(!BRD_Init(argc, args)){
 		DEBUG_COUT <<  "Failed to initialize!" << std::endl;
 		return -1;
 	}
-
-	InitClassTable();
-    cscene = new BRD_Scene("test.scene");
+    /*cscene = new BRD_Scene("test.scene");   // TODO: Replace with cscene.load("file"). Cscene should be an object instead of a pointer.
 
 	// Scene debug
 	DEBUG_COUT << "Scene contents:\nTexture list:\n\n";
@@ -113,65 +63,58 @@ int main( int argc, char* args[] ){
 	cscene->MatMan.PrintLeaves();
 	DEBUG_COUT << "\n";
 	DEBUG_COUT << "Scene loading step: completed\n";
-    system("pause");
+    system("pause");*/
 
-	// OpenGL parameters
-	// if flag("vid") = true
-	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-	glEnable(GL_BLEND);
-    glBlendEquation(GL_FUNC_ADD);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	/*glEnable(GL_SCISSOR_TEST);
-	glScissor(250, 150, 300, 300);*/
+    /*{
+        // SCENE LOADING STEP
+        // Load and precache all the data needed for the scene, then load the object & scenery data
 
-	// SCENE LOADING STEP
-	// Load and precache all the data needed for the scene, then load the object & scenery data
+        // Mesh loading
+        BRD_Mesh skycube("models/skycube.vlist", 3);
+        BRD_Mesh renderplane = LoadTestObject();
 
-	// Mesh loading
-    BRD_Mesh skycube("models/skycube.vlist", 3);
-    BRD_Mesh renderplane = LoadTestObject();
-
-    // Shader object loading
-    //
+        // Shader object loading
+        //
         Shader skybox("shaders/skybox.vert", "shaders/skybox.frag");
         Shader postprocess("shaders/postprocess.vert", "shaders/postprocess.frag");
 
-    // Texture loading
-    BRD_Texture2D blank ("textures/blank.png");
-    BRD_Texture2D blankw ("textures/blankw.png");
+        // Texture loading
+        BRD_Texture2D blank ("textures/blank.png");
+        BRD_Texture2D blankw ("textures/blankw.png");
 
-    // Skybox texture loading: several skybox textures may be loaded and changed on the fly.
-    // Dynamic cubemap reflection maps may also be used.
-    //BRD_TextureCube skyboxtex("textures/skybox/2desert", ".bmp");
-    BRD_TextureCube skyboxtex("textures/skybox/sky_trainstation01", ".png");
+        // Skybox texture loading: several skybox textures may be loaded and changed on the fly.
+        // Dynamic cubemap reflection maps may also be used.
+        //BRD_TextureCube skyboxtex("textures/skybox/2desert", ".bmp");
+        BRD_TextureCube skyboxtex("textures/skybox/sky_trainstation01", ".png");
 
-    // Setup objects
-    // .. materials/models
+        // Setup objects
+        // .. materials/models
 
-    // .. cameras
-    double fov = 45.0;
-    BRD_Camera cam = BRD_Camera(glm::vec3(0.0, 0.0, 5.0)), altcam = BRD_Camera(), *curcam = &cam;
+        // .. cameras
+        double fov = 45.0;
+        BRD_Camera cam = BRD_Camera(glm::vec3(0.0, 0.0, 5.0)), altcam = BRD_Camera(), *curcam = &cam;
 
-    // .. lights
+        // .. lights
 
-    // Framebuffer
-    BRD_Framebuffer screen_render(SCREEN_WIDTH, SCREEN_HEIGHT);
+        // Framebuffer
+        BRD_Framebuffer screen_render(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    GLfloat xshift, yshift;
-    // TODO: make global - for usage in separate functions
-    GLfloat deltaTime = 0.0f;	// Time between current frame and last frame
-    GLfloat lastFrame = 0.0f;  	// Time of last frame
+        GLfloat xshift, yshift;
 
-    glm::vec3 inv = glm::vec3(-1.0, -1.0, -1.0);
-	bool isquit;
-	SDL_Event event;
-	SDL_bool mouse_grab = SDL_TRUE;
+        glm::vec3 inv = glm::vec3(-1.0, -1.0, -1.0);
+        SDL_Event event;
+        SDL_bool mouse_grab = SDL_TRUE;
+    }*/
+        // TODO: make global - for usage in separate functions
+        GLfloat deltaTime = 0.0f;	// Time between current frame and last frame
+        GLfloat lastFrame = 0.0f;  	// Time of last frame
 	while (!isquit){
         // Frame timer update
         GLfloat currentFrame = (GLfloat)SDL_GetTicks() / 1000.0;
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
+        if (flag_novid == false){/*
         // Input processing
         // TODO: Separate into different functions. Will need console cmds implementation (?)
         // Event processor inside BRD_Input.
@@ -331,9 +274,11 @@ int main( int argc, char* args[] ){
 
         // Update window
         SDL_GL_SwapWindow(glWindow);
+        */}
+        else DEBUG_Console();
 	}
 
 	//Free resources and close SDL
-	close();
+	BRD_Shutdown();
 	return 0;
 }

@@ -37,7 +37,7 @@ void RegisterClass_MdlStatic(){
     DEBUG_COUT << " /class \"mdl_static\"\n";
 }
 
-void InitClassTable(){
+void BRD_InitClassTable(){
     RegisterClass_ClassRoot();
     RegisterClass_MdlStatic();
     DEBUG_COUT << "Class table initialized\n";

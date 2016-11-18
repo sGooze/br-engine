@@ -111,7 +111,7 @@ public:
     }
 };
 
-void InitClassTable();
+void BRD_InitClassTable();
 
 ////////////////////////////
 

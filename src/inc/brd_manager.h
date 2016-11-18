@@ -82,7 +82,7 @@ private:
         std::cout << "binTree_Manager::AddElement - failed to add new element.\n";
         return NULL;
     };
-    void _GetAllElementsPtr(std::string& mask, std::vectors& elements){
+    void _GetAllElementsPtr(std::string& mask, std::vector<TYPE>& elements){
         // return_root_when_failed is only used in the root leaf function
         if (mask.length() == 0){
             std::cout << "binTree_Manager::_GetAllElementsPtr: mask is empty\n";
