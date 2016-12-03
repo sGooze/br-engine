@@ -13,6 +13,15 @@ static int argc;
 static char** args;
 
 static bool CheckFlag(const char* flag){
+    // TODO: Expand flag check akin to this:
+    // if flag.length == 1
+    //  for() if args[i][0] == '-' && args[i][1] != '-'
+    //   args[i].contains(flag)
+    // else if flag.length > 1
+    //  for() if args[i][0] == '-' && args[i][1] == '-'
+    //   args[i].equal(flag minus first two symbols)
+    // if args[i][0] = '+'
+    //  consoleGlobal.read(args[i])
     for (int i = 1; i < argc; i++){
         if (strcmp(args[i], flag) == 0){
             DEBUG_COUT << " Flag set: " << flag;

@@ -13,10 +13,6 @@
 
 #define __BRD_SCENE
 
-// Parser stuff - will be here for a while
-typedef std::vector<std::string> tokenVec;
-tokenVec StrToTokenVec(std::string);
-
 //----------------------------
 // BRD_Scene - contains level geometry and objects
 //----------------------------

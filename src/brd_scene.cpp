@@ -56,7 +56,7 @@ bool ShaderLoaderFunc(std::string& name, Shader& content){
 }
 /* * * * * * * * *       Common parser functions       * * * * * * * * */
 
-tokenVec StrToTokenVec(std::string str){
+tokenVec CON_Console::GetTokens(std::string& str){
     // Search for substrings separated with whitespaces
     // Parts of string, enclosed in quotation marks, should be
     // treated as a single token, regardless of whitespace presence
@@ -150,7 +150,7 @@ typedef bool (*ParseFunc) (BRD_Scene*, std::string&);
 
 static bool ParseShader(BRD_Scene* scene, std::string& str){
     DEBUG_COUT << "SHADER: " << str << std::endl;
-    tokenVec tkens = StrToTokenVec(str);
+    tokenVec tkens = consoleGlobal.GetTokens(str);
     if (tkens.size() <= 0)
         return true;
 
@@ -300,7 +300,7 @@ static bool ParseMaterial(BRD_Scene* scene, std::string& str){
        If there is no such token, default value is passed.
     */
     DEBUG_COUT << "MAT: " << str << std::endl;
-    tokenVec tkens = StrToTokenVec(str);
+    tokenVec tkens = consoleGlobal.GetTokens(str);
     if (tkens.size() <= 0)
         return true;
 
@@ -423,7 +423,7 @@ static glm::vec3 TokenToVec3(std::string& token){
     // Vectors definitions should be formatted as following:
     // $vector_field "0.0 0.0 0.0"
     DEBUG_COUT << "|TokenToVec3 - got token \"" << token << "\"\n";
-    tokenVec vec_fields = StrToTokenVec(token);
+    tokenVec vec_fields = consoleGlobal.GetTokens(token);
     TokenContents(vec_fields);
     if (vec_fields.size() != 3){
         DEBUG_COUT << "WARNING: Improperly formatted vec3 definition: \"" << token << "\"\n";
@@ -438,7 +438,7 @@ static glm::vec3 TokenToVec3(std::string& token){
 static void ParseTokenToVec3(std::string& token, void *addr){
     // TokenToVec3 approach crashes and burns, so this will be used instead - at least, for now
     DEBUG_COUT << "|ParseTokenToVec3 - got token \"" << token << "\"\n";
-    tokenVec vec_fields = StrToTokenVec(token);
+    tokenVec vec_fields = consoleGlobal.GetTokens(token);
     TokenContents(vec_fields);
     glm::vec3 *fin = static_cast<glm::vec3*>(addr);
     if (vec_fields.size() != 3){
@@ -498,7 +498,7 @@ static bool ParseEntity_ParseTokens(tokenVec& tkens, BRD_Scene* scene){
 
 static bool ParseEntity(BRD_Scene* scene, std::string& str){
 //    BRD_EntityMaker* mkr = ent_class_table.GetElementPtr(/*classname token*/);
-    tokenVec tkens = StrToTokenVec(str);
+    tokenVec tkens = consoleGlobal.GetTokens(str);
     if (tkens.size() <= 0)
         return true;
 
